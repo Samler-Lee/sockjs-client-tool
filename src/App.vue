@@ -141,21 +141,31 @@ const checkServerConnected = () => {
 
 const connectServer = () => {
   const host = wsHost.value
+  if (host.length === 0) {
+    globalMessage.value.push({ time: new Date().toLocaleString(), content: `请输入正确的地址`, type: "warning" })
+    return false
+  }
 
   connecting.value = true
-  socket.value = new SockJS(host)
-  stompClient.value = Stomp.over(socket.value)
-  globalMessage.value.push({time: new Date().toLocaleString(), content: `${host} 正在连接...`, type: "info"})
-  stompClient.value.connect({}, (frame: any) => {
-    connecting.value = false
-    isConnected.value = true
+  try {
+    socket.value = new SockJS(host)
+    stompClient.value = Stomp.over(socket.value)
+    globalMessage.value.push({ time: new Date().toLocaleString(), content: `${host} 正在连接...`, type: "info" })
+    stompClient.value.connect({}, (frame: any) => {
+      connecting.value = false
+      isConnected.value = true
 
-    globalMessage.value.push({time: new Date().toLocaleString(), content: `${host} 连接成功`, type: "success"})
-  }, (error: any) => {
-    globalMessage.value.push({time: new Date().toLocaleString(), content: `${host} 连接失败: ${error}`, type: "danger"})
+      globalMessage.value.push({ time: new Date().toLocaleString(), content: `${host} 连接成功`, type: "success" })
+    }, (error: any) => {
+      globalMessage.value.push({ time: new Date().toLocaleString(), content: `${host} 连接失败: ${error}`, type: "danger" })
+      connecting.value = false;
+      isConnected.value = false;
+    });
+  } catch (e: any) {
+    globalMessage.value.push({ time: new Date().toLocaleString(), content: `连接时出现错误: ${e}`, type: "warning" })
     connecting.value = false;
     isConnected.value = false;
-  });
+  }
 }
 
 const disconnectServer = () => {

@@ -106,9 +106,10 @@
 </template>
 
 <script setup lang="ts">
-import SockJS from "sockjs-client/dist/sockjs.min.js";
-import Stomp from "stompjs";
-import { ref, nextTick } from "vue";
+import type { ElScrollbar } from "element-plus"
+import SockJS from "sockjs-client/dist/sockjs.min.js"
+import Stomp from "stompjs"
+import { ref, nextTick, onMounted } from "vue"
 
 const wsHost = ref("")
 const socket = ref<WebSocket | null>(null)
@@ -118,6 +119,12 @@ const isConnected = ref(false)
 const headers = ref<WSHeadersOrigin[]>([])
 const mainScrollRef = ref<InstanceType<typeof ElScrollbar>>()
 const mainInnerRef = ref<HTMLDivElement>()
+
+const globalMessage = ref<TopicMessage[]>([])
+const messages = ref<TopicMessageSet>({})
+const pushGlobalMessage = (content: string, type?: TopicMessage["type"]) => {
+  globalMessage.value.push({ time: new Date().toLocaleString(), content, type })
+}
 
 const convertHeaders = () => {
   return headers.value.reduce((p: WSHeaders, c: WSHeadersOrigin) => {
@@ -142,7 +149,7 @@ const checkServerConnected = () => {
 const connectServer = () => {
   const host = wsHost.value
   if (host.length === 0) {
-    globalMessage.value.push({ time: new Date().toLocaleString(), content: `请输入正确的地址`, type: "warning" })
+    pushGlobalMessage('请输入正确的地址', 'warning')
     return false
   }
 
@@ -150,29 +157,30 @@ const connectServer = () => {
   try {
     socket.value = new SockJS(host)
     stompClient.value = Stomp.over(socket.value)
-    globalMessage.value.push({ time: new Date().toLocaleString(), content: `${host} 正在连接...`, type: "info" })
+
+    pushGlobalMessage(`${host} 正在连接...`)
     stompClient.value.connect({}, (frame: any) => {
       connecting.value = false
       isConnected.value = true
 
-      globalMessage.value.push({ time: new Date().toLocaleString(), content: `${host} 连接成功`, type: "success" })
+      pushGlobalMessage(`${host} 连接成功`, 'success')
     }, (error: any) => {
-      globalMessage.value.push({ time: new Date().toLocaleString(), content: `${host} 连接失败: ${error}`, type: "danger" })
-      connecting.value = false;
-      isConnected.value = false;
-    });
+      pushGlobalMessage(`${host} 连接失败: ${error}`, 'danger')
+      connecting.value = false
+      isConnected.value = false
+    })
   } catch (e: any) {
-    globalMessage.value.push({ time: new Date().toLocaleString(), content: `连接时出现错误: ${e}`, type: "warning" })
-    connecting.value = false;
-    isConnected.value = false;
+    pushGlobalMessage(`${host} 连接时出现错误: ${e}`, 'danger')
+    connecting.value = false
+    isConnected.value = false
   }
 }
 
 const disconnectServer = () => {
   if (checkServerConnected()) {
     stompClient.value!.disconnect(() => {
-      isConnected.value = false;
-      globalMessage.value.push({time: new Date().toLocaleString(), content: '已断开连接', type: "danger"})
+      isConnected.value = false
+      pushGlobalMessage('已断开连接')
     });
   }
 }
@@ -191,13 +199,6 @@ const topic = ref([
   { name: "全局消息", topic: '#ws-test-global', unread: 0 },
 ])
 const currentTopic = ref('#ws-test-global')
-
-const globalMessage = ref<TopicMessage[]>([
-  { time: new Date().toLocaleString(), content: "欢迎使用SockJS在线测试工具" },
-  { time: new Date().toLocaleString(), content: "如果在使用过程中遇到任何问题，欢迎加我QQ进行讨论：1045704373" },
-  { time: new Date().toLocaleString(), content: "Blog: https://www.samler.cn" },
-])
-const messages = ref<TopicMessageSet>({})
 
 const changeCurrentTopic = (key: string) => {
   currentTopic.value = key
@@ -233,7 +234,7 @@ const subscribeTopic = () => {
         console.log(topic.value.filter(item => item.topic === topicId))
         topic.value.filter(item => item.topic === topicId)[0].unread++
       }
-    }, convertHeaders());
+    }, convertHeaders())
 
     topic.value.push({
       name: subscribeTopicForm.value.name.length === 0 ? subscribeTopicForm.value.topic : subscribeTopicForm.value.name,
@@ -276,6 +277,11 @@ const deleteTopic = () => {
     globalMessage.value.push({ time: new Date().toLocaleString(), content: `取消订阅 ${topicId}` })
   }
 }
+
+onMounted(() => {
+  pushGlobalMessage("欢迎使用SockJS在线测试工具")
+  pushGlobalMessage("如果在使用过程中遇到任何问题，欢迎加我QQ进行讨论：1045704373")
+})
 </script>
 
 <style scoped lang="scss">

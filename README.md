@@ -1,4 +1,7 @@
 # sockjs-client-tool
+[![Build and Deploy](https://github.com/Samler-Lee/sockjs-client-tool/actions/workflows/pages.yml/badge.svg)](https://github.com/Samler-Lee/sockjs-client-tool/actions/workflows/pages.yml)
+[![CodeQL](https://github.com/Samler-Lee/sockjs-client-tool/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Samler-Lee/sockjs-client-tool/actions/workflows/github-code-scanning/codeql)
+
 一个基于sockjs的websocket调试工具
 
 ## 特性

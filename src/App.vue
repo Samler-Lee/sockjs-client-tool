@@ -16,7 +16,7 @@
       <div class="logs">
         <el-container>
           <el-aside width="15rem" height="100%">
-            <el-menu :default-active="topic[0].topic" @select="changeCurrentTopic">
+            <el-menu :default-active="currentTopic" @select="changeCurrentTopic">
               <el-menu-item v-for="item in topic" :key="item.topic" :index="item.topic">
                 <div class="menu-item">
                   <div class="title">{{ item.name }}</div>
@@ -208,7 +208,7 @@ const sendMessage = () => {
 const topic = ref([
   { name: "全局消息", topic: '#ws-test-global', unread: 0 },
 ])
-const currentTopic = ref('#ws-test-global')
+const currentTopic = ref(topic.value[0].topic)
 
 const changeCurrentTopic = (key: string) => {
   currentTopic.value = key
@@ -277,10 +277,19 @@ const clearTopicMessage = () => {
 
 const deleteTopic = () => {
   const topicId = currentTopic.value
-  topic.value = topic.value.filter(item => item.topic !== topicId)
+  let idx = 0
+  topic.value = topic.value.filter((item, index) => {
+    const match = item.topic !== topicId
+    if (!match) {
+      idx = index
+    }
+    return match
+  })
+
   if (checkServerConnected()) {
     stompClient.value!.unsubscribe(topicId);
     globalMessage.value.push({ time: new Date().toLocaleString(), content: `取消订阅 ${topicId}` })
+    currentTopic.value = topic.value[idx - 1].topic
   }
 }
 

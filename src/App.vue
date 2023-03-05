@@ -130,6 +130,9 @@ const globalMessage = ref<TopicMessage[]>([])
 const messages = ref<TopicMessageSet>({})
 const pushGlobalMessage = (content: string, type?: TopicMessage["type"]) => {
   globalMessage.value.push({ time: new Date().toLocaleString(), content, type })
+  if (currentTopic.value === topic.value[0].topic) {
+    logsToBottom()
+  }
 }
 
 const convertHeaders = () => {

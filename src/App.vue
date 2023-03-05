@@ -117,8 +117,14 @@ const stompClient = ref<Stomp.Client | null>(null)
 const connecting = ref(false)
 const isConnected = ref(false)
 const headers = ref<WSHeadersOrigin[]>([])
+
 const mainScrollRef = ref<InstanceType<typeof ElScrollbar>>()
 const mainInnerRef = ref<HTMLDivElement>()
+const logsToBottom = () => {
+  nextTick(() => {
+    mainScrollRef.value!.setScrollTop(mainInnerRef.value!.clientHeight)
+  })
+}
 
 const globalMessage = ref<TopicMessage[]>([])
 const messages = ref<TopicMessageSet>({})
@@ -192,6 +198,7 @@ const sendMessageForm = ref({
 const sendMessage = () => {
   if (checkServerConnected()) {
     stompClient.value!.send(sendMessageForm.value.destination, convertHeaders(), sendMessageForm.value.messageContent);
+    pushGlobalMessage(`发送消息 ${sendMessageForm.value.destination ? `[${sendMessageForm.value.destination}]` : ''}: ${sendMessageForm.value.messageContent}`)
   }
 }
 
@@ -203,9 +210,7 @@ const currentTopic = ref('#ws-test-global')
 const changeCurrentTopic = (key: string) => {
   currentTopic.value = key
   topic.value.filter(item => item.topic === key)[0].unread = 0
-  nextTick(() => {
-    mainScrollRef.value!.setScrollTop(mainInnerRef.value!.clientHeight)
-  })
+  logsToBottom()
 }
 
 const subscribeTopicForm = ref({
@@ -227,9 +232,7 @@ const subscribeTopic = () => {
 
       // 日志滚动到底部，或是记录未读消息数量
       if (currentTopic.value === topicId) {
-        nextTick(() => {
-          mainScrollRef.value!.setScrollTop(mainInnerRef.value!.clientHeight)
-        })
+        logsToBottom()
       } else {
         console.log(topic.value.filter(item => item.topic === topicId))
         topic.value.filter(item => item.topic === topicId)[0].unread++

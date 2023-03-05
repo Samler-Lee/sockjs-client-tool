@@ -145,11 +145,7 @@ const convertHeaders = () => {
 const checkServerConnected = () => {
   const connected = isConnected.value && stompClient.value != null
   if (!connected) {
-    ElNotification.error({
-      type: 'error',
-      title: "服务器未连接",
-      message: "请先连接服务器，再尝试此操作"
-    })
+    ElMessage.error("请先连接服务器，再尝试此操作")
   }
 
   return connected

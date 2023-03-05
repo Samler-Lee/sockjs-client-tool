@@ -10,6 +10,7 @@
     "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.1.0",
     "element-plus": "^2.2.33",
     "sass": "^1.58.3",
     "sass-loader": "^13.2.0",

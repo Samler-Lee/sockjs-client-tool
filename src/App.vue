@@ -51,10 +51,15 @@
     </el-card>
     <el-card class="console-card">
       <div class="console">
-        <el-space style="margin-bottom: .5rem;">
-          <el-button type="primary" text @click="subscribeTopicDialogVisible = true">添加订阅</el-button>
-          <el-button type="primary" text @click="headerSettingDialogVisible = true">设置Headers</el-button>
-        </el-space>
+        <div class="toolbar">
+          <el-space>
+            <el-button type="primary" text @click="subscribeTopicDialogVisible = true">添加订阅</el-button>
+            <el-button type="primary" text @click="headerSettingDialogVisible = true">设置Headers</el-button>
+          </el-space>
+          <el-space>
+              <el-button link :icon="inDarkMode ? Sunny : Moon" size="large" @click="toggleDark()"></el-button>
+          </el-space>
+        </div>
 
         <el-space direction="vertical" wrap style="width: 100%" fill>
           <el-input class="destination-input" type="text" placeholder="请求路径" v-model="sendMessageForm.destination"></el-input>
@@ -110,6 +115,11 @@ import type { ElScrollbar } from "element-plus"
 import SockJS from "sockjs-client/dist/sockjs.min.js"
 import Stomp from "stompjs"
 import { ref, nextTick, onMounted } from "vue"
+import { Sunny, Moon } from "@element-plus/icons-vue"
+import { useDark, useToggle } from '@vueuse/core'
+
+const inDarkMode = useDark()
+const toggleDark = useToggle(inDarkMode)
 
 const wsHost = ref("")
 const socket = ref<WebSocket | null>(null)
@@ -383,6 +393,15 @@ onMounted(() => {
           }
         }
       }
+    }
+  }
+
+  .console {
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: .5rem;
     }
   }
 }

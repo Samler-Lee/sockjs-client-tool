@@ -118,7 +118,7 @@ import { ref, nextTick, onMounted } from "vue"
 import { Sunny, Moon } from "@element-plus/icons-vue"
 import { useDark, useToggle } from '@vueuse/core'
 
-const inDarkMode = useDark()
+const inDarkMode = useDark({storage: localStorage})
 const toggleDark = useToggle(inDarkMode)
 
 const wsHost = ref("")

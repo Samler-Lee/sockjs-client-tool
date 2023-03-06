@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Build
 
 on:
   push:
@@ -20,10 +20,4 @@ jobs:
       - name: Install and Build
         run: |
           npm ci
-          npm run build-only
-
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          branch: gh-pages
-          folder: dist
+          npm run build

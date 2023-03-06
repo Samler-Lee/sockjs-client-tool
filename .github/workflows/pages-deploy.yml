@@ -1,10 +1,10 @@
-name: Build and Deploy
+name: Pages Deploy
 
 on:
   push:
-    branches: ["master"]
+    branches: ["online-release"]
   pull_request:
-    branches: ["master"]
+    branches: ["online-release"]
 
 permissions:
   contents: write
